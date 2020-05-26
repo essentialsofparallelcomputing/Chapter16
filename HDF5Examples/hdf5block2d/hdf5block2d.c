@@ -77,6 +77,7 @@ int main(int argc, char *argv[])
   free(data1);
   free(data_restore);
 
+  MPI_Comm_free(mpi_hdf5_comm);
   MPI_Finalize();
   return 0;
 }
