@@ -10,9 +10,8 @@ int main(int argc, char *argv[])
 {
   MPI_Init(&argc, &argv);
 
-  int MyPE, nprocs;
-  MPI_Comm_rank(MPI_COMM_WORLD, &MyPE);
-  MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
   // for multiple files, subdivide communicator and set colors for each set
   MPI_Comm mpi_hdf5_comm = MPI_COMM_NULL;
@@ -31,10 +30,9 @@ int main(int argc, char *argv[])
     nx_offset[i] = nx_offset[i-1] +nx_count[i-1];
   }
 
-  char filename[30];
   double **data1 = (double **)malloc2D(ny+2*ng, nx+2*ng);
-  init_array(ny, nx, ng, data1);
   double **data_restore = (double **)malloc2D(ny+2*ng, nx+2*ng);
+  init_array(ny, nx, ng, data1);
   for (int j=0; j<ny+2*ng; j++){
     for (int i=0; i<nx+2*ng; i++){
       data_restore[j][i] = 0.0;
@@ -42,8 +40,10 @@ int main(int argc, char *argv[])
   }
 
   hid_t memspace = H5S_NULL, filespace = H5S_NULL;
-  hdf5_file_init(ny, nx, ng, nx_global, nx_offset[rank_color], mpi_hdf5_comm, &memspace, &filespace);
+  hdf5_file_init(ny, nx, ng, nx_global, nx_offset[rank_color], mpi_hdf5_comm,
+                 &memspace, &filespace);
 
+  char filename[30];
   if (ncolors > 1) {
     sprintf(filename,"example_%02d.hdf5",color);
   } else {
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 
   hdf5_file_finalize(&memspace, &filespace);
 
-  if (MyPE == 0) printf("Verifying  checkpoint\n");
+  if (rank == 0) printf("Verifying  checkpoint\n");
 
   int ierr = 0;
   // verification
@@ -65,15 +65,17 @@ int main(int argc, char *argv[])
     for (int i=0; i<nx+2*ng; i++){
       if (data_restore[j][i] != data1[j][i]) {
         ierr++;
-        printf("DEBUG -- j %d i %d restored %lf data %lf\n",j,i,data_restore[j][i],data1[j][i]);
+        printf("DEBUG -- j %d i %d restored %lf data %lf\n",
+               j,i,data_restore[j][i],data1[j][i]);
       }
     }
   }
   int ierr_global = 0;
   MPI_Allreduce(&ierr, &ierr_global, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-  if (MyPE == 0 && ierr_global == 0) printf("   Checkpoint has been verified\n");
+  if (rank == 0 && ierr_global == 0) printf("   Checkpoint has been verified\n");
 
   free(data1);
+  free(data_restore);
 
   MPI_Finalize();
   return 0;

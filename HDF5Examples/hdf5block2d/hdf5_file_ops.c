@@ -7,13 +7,15 @@ hid_t create_hdf5_memspace(int ny, int nx, int ng);
 hid_t create_hdf5_dataset(hid_t file_identifier, hid_t filespace);
 hid_t open_hdf5_dataset(hid_t file_identifier);
 
-void hdf5_file_init(int ny, int nx, int ng, int nx_global, int nx_offset, MPI_Comm mpi_hdf5_comm, hid_t *memspace, hid_t *filespace){
+void hdf5_file_init(int ny, int nx, int ng, int nx_global, int nx_offset,
+    MPI_Comm mpi_hdf5_comm, hid_t *memspace, hid_t *filespace){
   // create data descriptors on disk and in memory
   *filespace = create_hdf5_filespace(ny, nx, nx_global, nx_offset, mpi_hdf5_comm);
   *memspace  = create_hdf5_memspace(ny, nx, ng);
 }
 
-hid_t create_hdf5_filespace(int ny, int nx, int nx_global, int nx_offset, MPI_Comm mpi_hdf5_comm){
+hid_t create_hdf5_filespace(int ny, int nx, int nx_global, int nx_offset,
+    MPI_Comm mpi_hdf5_comm){
   // create the dataspace for data stored on disk using the hyperslab call
   hsize_t dims[] = {ny, nx_global};
   int ndims = sizeof(dims)/sizeof(hsize_t);
@@ -54,7 +56,8 @@ void hdf5_file_finalize(hid_t *memspace, hid_t *filespace){
   *filespace = H5S_NULL;
 }
 
-void write_hdf5_file(const char *filename, double **data1, hid_t memspace, hid_t filespace, MPI_Comm mpi_hdf5_comm) {
+void write_hdf5_file(const char *filename, double **data1, hid_t memspace,
+    hid_t filespace, MPI_Comm mpi_hdf5_comm) {
   hid_t file_identifier = create_hdf5_file(filename, mpi_hdf5_comm);
 
   // Create property list for collective dataset write.
@@ -65,8 +68,10 @@ void write_hdf5_file(const char *filename, double **data1, hid_t memspace, hid_t
   //hid_t dataset2 = create_hdf5_dataset(file_identifier, filespace);
 
   // write the data to disk using both the memory space and the data space.
-  H5Dwrite(dataset1, H5T_IEEE_F64LE, memspace, filespace, xfer_plist, &(data1[0][0]));
-  //H5Dwrite(dataset2, H5T_IEEE_F64LE, memspace, filespace, xfer_plist, &(data2[0][0]));
+  H5Dwrite(dataset1, H5T_IEEE_F64LE, memspace, filespace, xfer_plist,
+           &(data1[0][0]));
+  //H5Dwrite(dataset2, H5T_IEEE_F64LE, memspace, filespace, xfer_plist,
+  //       &(data2[0][0]));
 
   H5Dclose(dataset1);
   //H5Dclose(dataset2);
@@ -94,7 +99,7 @@ hid_t create_hdf5_file(const char *filename, MPI_Comm mpi_hdf5_comm){
   H5Pset_fapl_mpio(file_access_plist, mpi_hdf5_comm, mpi_info);
 
   // Open the file collectively
-  // H5F_ACC_TRUNC is for overwrite existing file if it exists. H5F_ACC_EXCL is no overwrite
+  // H5F_ACC_TRUNC - overwrite existing file. H5F_ACC_EXCL - no overwrite
   // 3rd argument is file creation property list. Using default here
   // 4th argument is the file access property list identifier
   hid_t file_identifier = H5Fcreate(filename, H5F_ACC_TRUNC, file_creation_plist,
@@ -112,18 +117,20 @@ hid_t create_hdf5_dataset(hid_t file_identifier, hid_t filespace){
   hid_t link_creation_plist    = H5P_DEFAULT; // Link creation property list
   hid_t dataset_creation_plist = H5P_DEFAULT; // Dataset creation property list
   hid_t dataset_access_plist   = H5P_DEFAULT; // Dataset access property list
-  hid_t dataset = H5Dcreate2(file_identifier, // Arg 1: file identifier
-    "data array",                             // Arg 2: dataset name
-    H5T_IEEE_F64LE,                           // Arg 3: datatype identifier
-    filespace,                                // Arg 4: filespace identifier
-    link_creation_plist,                      // Arg 5: link creation property list
-    dataset_creation_plist,                   // Arg 6: dataset creation property list
-    dataset_access_plist);                    // Arg 7: dataset access property list
+  hid_t dataset = H5Dcreate2(
+    file_identifier,          // Arg 1: file identifier
+    "data array",             // Arg 2: dataset name
+    H5T_IEEE_F64LE,           // Arg 3: datatype identifier
+    filespace,                // Arg 4: filespace identifier
+    link_creation_plist,      // Arg 5: link creation property list
+    dataset_creation_plist,   // Arg 6: dataset creation property list
+    dataset_access_plist);    // Arg 7: dataset access property list
 
   return dataset;
 }
 
-void read_hdf5_file(const char *filename, double **data1, hid_t memspace, hid_t filespace, MPI_Comm mpi_hdf5_comm) {
+void read_hdf5_file(const char *filename, double **data1, hid_t memspace,
+    hid_t filespace, MPI_Comm mpi_hdf5_comm) {
   hid_t file_identifier = open_hdf5_file(filename, mpi_hdf5_comm);
 
   // Create property list for collective dataset write.
@@ -132,7 +139,8 @@ void read_hdf5_file(const char *filename, double **data1, hid_t memspace, hid_t 
 
   hid_t dataset1 = open_hdf5_dataset(file_identifier);
   // read the data from disk using both the memory space and the data space.
-  H5Dread(dataset1, H5T_IEEE_F64LE, memspace, filespace, H5P_DEFAULT, &(data1[0][0]));
+  H5Dread(dataset1, H5T_IEEE_F64LE, memspace, filespace, H5P_DEFAULT,
+          &(data1[0][0]));
   H5Dclose(dataset1);
 
   H5Pclose(xfer_plist);
@@ -157,7 +165,7 @@ hid_t open_hdf5_file(const char *filename, MPI_Comm mpi_hdf5_comm){
   H5Pset_fapl_mpio(file_access_plist, mpi_hdf5_comm, mpi_info);
 
   // Open the file collectively
-  // H5F_ACC_TRUNC is for overwrite existing file if it exists. H5F_ACC_EXCL is no overwrite
+  // H5F_ACC_TRUNC - overwrite existing file. H5F_ACC_EXCL - no overwrite
   // 3rd argument is file creation property list. Using default here
   // 4th argument is the file access property list identifier
   hid_t file_identifier = H5Fopen(filename, H5F_ACC_RDWR, file_access_plist);
@@ -172,9 +180,10 @@ hid_t open_hdf5_file(const char *filename, MPI_Comm mpi_hdf5_comm){
 hid_t open_hdf5_dataset(hid_t file_identifier){
   // open the dataset
   hid_t dataset_access_plist   = H5P_DEFAULT; // Dataset access property list
-  hid_t dataset = H5Dopen2(file_identifier,   // Arg 1: file identifier
-    "data array",                             // Arg 2: dataset name to match for read
-    dataset_access_plist);                    // Arg 3: dataset access property list
+  hid_t dataset = H5Dopen2(
+    file_identifier,        // Arg 1: file identifier
+    "data array",           // Arg 2: dataset name to match for read
+    dataset_access_plist);  // Arg 3: dataset access property list
 
   return dataset;
 }
