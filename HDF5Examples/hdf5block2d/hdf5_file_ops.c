@@ -18,35 +18,35 @@ void hdf5_file_init(int ng, int ny_global, int nx_global, int ny, int nx,
 hid_t create_hdf5_filespace(int ny_global, int nx_global, int ny, int nx,
     int ny_offset, int nx_offset, MPI_Comm mpi_hdf5_comm){
   // create the dataspace for data stored on disk using the hyperslab call
-  hsize_t file_dims[] = {ny_global, nx_global};
-  int ndims = sizeof(file_dims)/sizeof(file_dims[0]);
+  hsize_t dims[] = {ny_global, nx_global};
+  int ndims = sizeof(dims)/sizeof(hsize_t);
 
-  hid_t filespace = H5Screate_simple(ndims, file_dims, NULL);
+  hid_t filespace = H5Screate_simple(ndims, dims, NULL);
 
   // figure out the offset into the filespace for the current processor
-  hsize_t file_start[] = {ny_offset, nx_offset};
-  hsize_t     stride[] = {1,         1};
-  hsize_t      count[] = {ny,        nx};
+  hsize_t  start[] = {ny_offset, nx_offset};
+  hsize_t stride[] = {1,         1};
+  hsize_t  count[] = {ny,        nx};
 
   H5Sselect_hyperslab(filespace, H5S_SELECT_SET,
-                file_start, stride, count, NULL);
+                start, stride, count, NULL);
   return filespace;
 }
 
 hid_t create_hdf5_memspace(int ny, int nx, int ng) {
   // create a memory space in memory using the hyperslab call
-  hsize_t mem_dims[] = {ny+2*ng, nx+2*ng};
-  int ndims = sizeof(mem_dims)/sizeof(mem_dims[0]);
+  hsize_t dims[] = {ny+2*ng, nx+2*ng};
+  int ndims = sizeof(dims)/sizeof(hsize_t);
 
-  hid_t memspace = H5Screate_simple(ndims, mem_dims, NULL);
+  hid_t memspace = H5Screate_simple(ndims, dims, NULL);
 
   // select the real data out of the array
-  hsize_t mem_start[] = {ng,   ng};
-  hsize_t    stride[] = {1,    1};
-  hsize_t     count[] = {ny,   nx};
+  hsize_t  start[] = {ng,   ng};
+  hsize_t stride[] = {1,    1};
+  hsize_t  count[] = {ny,   nx};
 
   H5Sselect_hyperslab(memspace, H5S_SELECT_SET,
-                      mem_start, stride, count, NULL);
+                      start, stride, count, NULL);
   return memspace;
 }
 
