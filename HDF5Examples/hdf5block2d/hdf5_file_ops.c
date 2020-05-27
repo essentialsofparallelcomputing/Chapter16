@@ -2,29 +2,30 @@
 
 hid_t create_hdf5_file(const char *filename, MPI_Comm mpi_hdf5_comm);
 hid_t open_hdf5_file(const char *filename, MPI_Comm mpi_hdf5_comm);
-hid_t create_hdf5_filespace(int ny, int nx, int nx_global, int nx_offset, MPI_Comm mpi_hdf5_comm);
+hid_t create_hdf5_filespace(int ny_global, int nx_global, int ny, int nx,
+    int ny_offset, int nx_offset, MPI_Comm mpi_hdf5_comm);
 hid_t create_hdf5_memspace(int ny, int nx, int ng);
 hid_t create_hdf5_dataset(hid_t file_identifier, hid_t filespace);
 hid_t open_hdf5_dataset(hid_t file_identifier);
 
-void hdf5_file_init(int ny, int nx, int ng, int nx_global, int nx_offset,
-    MPI_Comm mpi_hdf5_comm, hid_t *memspace, hid_t *filespace){
+void hdf5_file_init(int ng, int ny_global, int nx_global, int ny, int nx,
+    int ny_offset, int nx_offset, MPI_Comm mpi_hdf5_comm, hid_t *memspace, hid_t *filespace){
   // create data descriptors on disk and in memory
-  *filespace = create_hdf5_filespace(ny, nx, nx_global, nx_offset, mpi_hdf5_comm);
+  *filespace = create_hdf5_filespace(ny_global, nx_global, ny, nx, ny_offset, nx_offset, mpi_hdf5_comm);
   *memspace  = create_hdf5_memspace(ny, nx, ng);
 }
 
-hid_t create_hdf5_filespace(int ny, int nx, int nx_global, int nx_offset,
-    MPI_Comm mpi_hdf5_comm){
+hid_t create_hdf5_filespace(int ny_global, int nx_global, int ny, int nx,
+    int ny_offset, int nx_offset, MPI_Comm mpi_hdf5_comm){
   // create the dataspace for data stored on disk using the hyperslab call
-  hsize_t dims[] = {ny, nx_global};
+  hsize_t dims[] = {ny_global, nx_global};
   int ndims = sizeof(dims)/sizeof(hsize_t);
 
   hid_t filespace = H5Screate_simple(ndims, dims, NULL);
 
   // figure out the offset into the filespace for the current processor
-  hsize_t  start[] = { 0, nx_offset};
-  hsize_t stride[] = { 1,         1};
+  hsize_t  start[] = {ny_offset, nx_offset};
+  hsize_t stride[] = {1,         1};
   hsize_t  count[] = {ny,        nx};
 
   H5Sselect_hyperslab(filespace, H5S_SELECT_SET,
@@ -41,7 +42,7 @@ hid_t create_hdf5_memspace(int ny, int nx, int ng) {
 
   // select the real data out of the array
   hsize_t  start[] = {ng,   ng};
-  hsize_t stride[] = { 1,    1};
+  hsize_t stride[] = {1,    1};
   hsize_t  count[] = {ny,   nx};
 
   H5Sselect_hyperslab(memspace, H5S_SELECT_SET,
