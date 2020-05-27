@@ -21,29 +21,29 @@ int main(int argc, char *argv[])
   MPI_Comm_rank(mpi_hdf5_comm, &rank_color);
 
   // set the dimensions of our data array and the number of ghost cells
-  int ny = 10, nx = 10, ng = 2, nx_global;
-  MPI_Allreduce(&nx, &nx_global, 1, MPI_INT, MPI_SUM, mpi_hdf5_comm);
-  int nx_offset[nprocs_color], nx_count[nprocs_color];
-  MPI_Allgather(&nx, 1, MPI_INT, nx_count, 1, MPI_INT, mpi_hdf5_comm);
-  nx_offset[0] = 0;
-  for (int i = 1; i < nprocs_color; i++){
-    nx_offset[i] = nx_offset[i-1] +nx_count[i-1];
-  }
+  int ndim = 2, ng = 2, ny = 10, nx = 10;
+  int global_subsizes[] = {ny, nx};
 
-  double **data1 = (double **)malloc2D(ny+2*ng, nx+2*ng);
+  int ny_offset = 0, nx_offset = 0;
+  MPI_Exscan(&nx, &nx_offset, 1, MPI_INT, MPI_SUM, mpi_hdf5_comm);
+  int global_offsets[] = {ny_offset, nx_offset};
+
+  int ny_global = ny, nx_global;
+  MPI_Allreduce(&nx, &nx_global, 1, MPI_INT, MPI_SUM, mpi_hdf5_comm);
+  int global_sizes[] = {ny_global, nx_global};
+  int data_size = global_sizes[0]*global_sizes[1];
+
+  double **data = (double **)malloc2D(ny+2*ng, nx+2*ng);
   double **data_restore = (double **)malloc2D(ny+2*ng, nx+2*ng);
-  init_array(ny, nx, ng, data1);
+  init_array(ny, nx, ng, data);
   for (int j=0; j<ny+2*ng; j++){
     for (int i=0; i<nx+2*ng; i++){
       data_restore[j][i] = 0.0;
     }
   }
 
-  int ny_global = ny;
-  int ny_offset = 0;
-
   hid_t memspace = H5S_NULL, filespace = H5S_NULL;
-  hdf5_file_init(ng, ny_global, nx_global, ny, nx, ny_offset, nx_offset[rank_color],
+  hdf5_file_init(ng, ny_global, nx_global, ny, nx, ny_offset, nx_offset,
                  mpi_hdf5_comm, &memspace, &filespace);
 
   char filename[30];
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
   }
 
   // Do the computation and write out a sequence of files
-  write_hdf5_file(filename, data1, memspace, filespace, mpi_hdf5_comm);
+  write_hdf5_file(filename, data, memspace, filespace, mpi_hdf5_comm);
   // Read back the data for verifying the file operations
   read_hdf5_file(filename, data_restore, memspace, filespace, mpi_hdf5_comm);
 
@@ -66,10 +66,10 @@ int main(int argc, char *argv[])
   // verification
   for (int j=0; j<ny+2*ng; j++){
     for (int i=0; i<nx+2*ng; i++){
-      if (data_restore[j][i] != data1[j][i]) {
+      if (data_restore[j][i] != data[j][i]) {
         ierr++;
         printf("DEBUG -- j %d i %d restored %lf data %lf\n",
-               j,i,data_restore[j][i],data1[j][i]);
+               j,i,data_restore[j][i],data[j][i]);
       }
     }
   }
@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
   MPI_Allreduce(&ierr, &ierr_global, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
   if (rank == 0 && ierr_global == 0) printf("   Checkpoint has been verified\n");
 
-  free(data1);
+  free(data);
   free(data_restore);
 
   MPI_Comm_free(&mpi_hdf5_comm);
