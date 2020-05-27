@@ -21,11 +21,12 @@ int main(int argc, char *argv[])
   MPI_Comm_rank(mpi_io_comm, &rank_color);
 
   // set the dimensions of our data array and the number of ghost cells
-  int ndim = 2, ng = 2, ny = 10, nx =10;
+  int ndim = 2, ng = 2, ny = 10, nx =10, ny_offset, nx_offset = 0;
   int global_subsizes[] = {ny, nx};
-  int global_offsets[] = {0, 0};
   int global_sizes[ndim];
-  MPI_Exscan(global_subsizes, global_offsets, ndim, MPI_INT, MPI_SUM, mpi_io_comm);
+  MPI_Exscan(&nx, &nx_offset, 1, MPI_INT, MPI_SUM, mpi_io_comm);
+  int global_offsets[] = {ny_offset, nx_offset};
+
   MPI_Allreduce(global_subsizes, global_sizes, ndim, MPI_INT, MPI_SUM, mpi_io_comm);
   int data_size = global_sizes[0]*global_sizes[1];
 

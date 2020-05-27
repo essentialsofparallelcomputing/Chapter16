@@ -39,8 +39,11 @@ int main(int argc, char *argv[])
     }
   }
 
+  int ny_global = ny;
+  int ny_offset = 0;
+
   hid_t memspace = H5S_NULL, filespace = H5S_NULL;
-  hdf5_file_init(ng, ny_global, nx_global, ny, nx, ny_offset[rank_color], nx_offset[rank_color],
+  hdf5_file_init(ng, ny_global, nx_global, ny, nx, ny_offset, nx_offset[rank_color],
                  mpi_hdf5_comm, &memspace, &filespace);
 
   char filename[30];
