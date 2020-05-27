@@ -9,9 +9,11 @@ hid_t create_hdf5_dataset(hid_t file_identifier, hid_t filespace);
 hid_t open_hdf5_dataset(hid_t file_identifier);
 
 void hdf5_file_init(int ng, int ny_global, int nx_global, int ny, int nx,
-    int ny_offset, int nx_offset, MPI_Comm mpi_hdf5_comm, hid_t *memspace, hid_t *filespace){
+    int ny_offset, int nx_offset, MPI_Comm mpi_hdf5_comm,
+    hid_t *memspace, hid_t *filespace){
   // create data descriptors on disk and in memory
-  *filespace = create_hdf5_filespace(ny_global, nx_global, ny, nx, ny_offset, nx_offset, mpi_hdf5_comm);
+  *filespace = create_hdf5_filespace(ny_global, nx_global, ny, nx,
+               ny_offset, nx_offset, mpi_hdf5_comm);
   *memspace  = create_hdf5_memspace(ny, nx, ng);
 }
 
