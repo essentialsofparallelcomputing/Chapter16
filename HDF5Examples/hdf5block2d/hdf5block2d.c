@@ -19,19 +19,22 @@ int main(int argc, char *argv[])
   int ncolors = 1, color = 0, nprocs_color, rank_color;
   MPI_Comm_size(mpi_hdf5_comm, &nprocs_color);
   MPI_Comm_rank(mpi_hdf5_comm, &rank_color);
+  int row_color = 1, col_color = rank_color;
+  MPI_Comm mpi_row_comm, mpi_col_comm;
+  MPI_Comm_split(mpi_hdf5_comm, row_color, rank_color, &mpi_row_comm);
+  MPI_Comm_split(mpi_hdf5_comm, col_color, rank_color, &mpi_col_comm);
 
   // set the dimensions of our data array and the number of ghost cells
   int ndim = 2, ng = 2, ny = 10, nx = 10;
   int global_subsizes[] = {ny, nx};
 
   int ny_offset = 0, nx_offset = 0;
-  MPI_Exscan(&nx, &nx_offset, 1, MPI_INT, MPI_SUM, mpi_hdf5_comm);
-  int global_offsets[] = {ny_offset, nx_offset};
+  MPI_Exscan(&nx, &nx_offset, 1, MPI_INT, MPI_SUM, mpi_row_comm);
+  MPI_Exscan(&ny, &ny_offset, 1, MPI_INT, MPI_SUM, mpi_col_comm);
 
-  int ny_global = ny, nx_global;
-  MPI_Allreduce(&nx, &nx_global, 1, MPI_INT, MPI_SUM, mpi_hdf5_comm);
-  int global_sizes[] = {ny_global, nx_global};
-  int data_size = global_sizes[0]*global_sizes[1];
+  int ny_global, nx_global;
+  MPI_Allreduce(&nx, &nx_global, 1, MPI_INT, MPI_SUM, mpi_row_comm);
+  MPI_Allreduce(&ny, &ny_global, 1, MPI_INT, MPI_SUM, mpi_col_comm);
 
   double **data = (double **)malloc2D(ny+2*ng, nx+2*ng);
   double **data_restore = (double **)malloc2D(ny+2*ng, nx+2*ng);
