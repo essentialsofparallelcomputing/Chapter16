@@ -54,9 +54,9 @@ int main(int argc, char *argv[])
 
   char filename[30];
   if (ncolors > 1) {
-    sprintf(filename,"example_%02d.hdf5",color);
+    sprintf(filename,"example_%02d.data",color);
   } else {
-    sprintf(filename,"example.hdf5",color);
+    sprintf(filename,"example.data",color);
   }
 
   // Do the computation and write out a sequence of files
@@ -86,7 +86,16 @@ int main(int argc, char *argv[])
   free(data);
   free(data_restore);
 
-  //MPI_Comm_free(mpi_hdf5_comm);
+  if (rank == 0) {
+     FILE *fp = fopen("example.data","rb");
+     for (int i = 0; i < 40; i++){
+       double x;
+       fread(&x, sizeof(double), 1, fp);
+       printf("x[%d] %lf\n",i,x);
+     }
+  }
+
+  MPI_Comm_free(&mpi_io_comm);
   MPI_Finalize();
   return 0;
 }

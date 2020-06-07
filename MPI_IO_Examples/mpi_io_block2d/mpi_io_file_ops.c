@@ -1,6 +1,7 @@
 #include "mpi_io_file_ops.h"
 
-MPI_File create_mpi_io_file(const char *filename, MPI_Comm mpi_io_comm);
+MPI_File create_mpi_io_file(const char *filename, MPI_Comm mpi_io_comm,
+       long long file_size);
 MPI_File open_mpi_io_file(const char *filename, MPI_Comm mpi_io_comm);
 
 static long long file_offset = 0;
@@ -34,7 +35,8 @@ void mpi_io_file_finalize(MPI_Datatype *memspace, MPI_Datatype *filespace){
 
 void write_mpi_io_file(const char *filename, double **data, int data_size,
     MPI_Datatype memspace, MPI_Datatype filespace, MPI_Comm mpi_io_comm){
-  MPI_File file_handle = create_mpi_io_file(filename, mpi_io_comm);
+  MPI_File file_handle = create_mpi_io_file(filename, mpi_io_comm,
+         (long long)data_size);
 
   MPI_File_set_view(file_handle, file_offset, MPI_DOUBLE, filespace,
          "native", MPI_INFO_NULL);
@@ -45,7 +47,8 @@ void write_mpi_io_file(const char *filename, double **data, int data_size,
   file_offset = 0;
 }
 
-MPI_File create_mpi_io_file(const char *filename, MPI_Comm mpi_io_comm){
+MPI_File create_mpi_io_file(const char *filename, MPI_Comm mpi_io_comm,
+        long long file_size){
   int file_mode = MPI_MODE_WRONLY | MPI_MODE_CREATE | MPI_MODE_UNIQUE_OPEN;
 
   MPI_Info mpi_info = MPI_INFO_NULL; // For MPI IO hints
@@ -56,6 +59,7 @@ MPI_File create_mpi_io_file(const char *filename, MPI_Comm mpi_io_comm){
 
   MPI_File file_handle = NULL;
   MPI_File_open(mpi_io_comm, filename, file_mode, mpi_info, &file_handle);
+  if (file_size > 0) MPI_File_preallocate(file_handle, file_size);
   file_offset = 0;
   return file_handle;
 }
