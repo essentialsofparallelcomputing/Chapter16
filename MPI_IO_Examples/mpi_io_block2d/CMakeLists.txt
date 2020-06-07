@@ -27,4 +27,4 @@ target_link_libraries(mpi_io_block2d ${MPI_C_LIBRARIES})
 
 # Cleanup
 add_custom_target(distclean COMMAND rm -rf CMakeCache.txt CMakeFiles
-                  Makefile cmake_install.cmake *.mpidata)
+                  Makefile cmake_install.cmake *.data)
