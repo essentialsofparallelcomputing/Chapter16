@@ -25,7 +25,7 @@ hid_t create_hdf5_filespace(int ny_global, int nx_global, int ny, int nx,
 
   hid_t filespace = H5Screate_simple(ndims, dims, NULL);
 
-  // figure out the offset into the filespace for the current processor
+  // figure out the offset into the filespace for the current process
   hsize_t  start[] = {ny_offset, nx_offset};
   hsize_t stride[] = {1,         1};
   hsize_t  count[] = {ny,        nx};

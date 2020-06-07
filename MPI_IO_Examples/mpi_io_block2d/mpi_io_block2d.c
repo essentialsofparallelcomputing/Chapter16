@@ -86,9 +86,6 @@ int main(int argc, char *argv[])
     printf("   Checkpoint has been verified\n");
   }
 
-  free(data);
-  free(data_restore);
-
   if (rank == 0) {
      FILE *fp = fopen("example.data","rb");
      for (int i = 0; i < 40; i++){
@@ -97,6 +94,9 @@ int main(int argc, char *argv[])
        printf("x[%d] %lf\n",i,x);
      }
   }
+
+  free(data);
+  free(data_restore);
 
   MPI_Comm_free(&mpi_io_comm);
   MPI_Finalize();
