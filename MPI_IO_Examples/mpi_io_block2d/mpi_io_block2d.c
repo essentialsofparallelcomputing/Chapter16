@@ -62,7 +62,8 @@ int main(int argc, char *argv[])
   // Do the computation and write out a sequence of files
   write_mpi_io_file(filename, data, data_size, memspace, filespace, mpi_io_comm);
   // Read back the data for verifying the file operations
-  read_mpi_io_file(filename, data_restore, data_size, memspace, filespace, mpi_io_comm);
+  read_mpi_io_file(filename, data_restore, data_size, memspace, filespace,
+                   mpi_io_comm);
 
   mpi_io_file_finalize(&memspace, &filespace);
 
@@ -81,7 +82,9 @@ int main(int argc, char *argv[])
   }
   int ierr_global = 0;
   MPI_Allreduce(&ierr, &ierr_global, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-  if (rank == 0 && ierr_global == 0) printf("   Checkpoint has been verified\n");
+  if (rank == 0 && ierr_global == 0) {
+    printf("   Checkpoint has been verified\n");
+  }
 
   free(data);
   free(data_restore);
