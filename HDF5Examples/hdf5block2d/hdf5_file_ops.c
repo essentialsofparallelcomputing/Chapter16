@@ -159,23 +159,16 @@ hid_t open_hdf5_file(const char *filename, MPI_Comm mpi_hdf5_comm){
   // set collective mode for metadata reads (ops)
   H5Pset_all_coll_metadata_ops(file_access_plist, true);
 
-  MPI_Info mpi_info = MPI_INFO_NULL; // For MPI IO hints
-  MPI_Info_create(&mpi_info);
-  MPI_Info_set(mpi_info, "striping_factor", "8");
-  MPI_Info_set(mpi_info, "striping_unit", "4194304");
-
   // tell the HDF5 library that we want to use MPI-IO to do the writing
-  H5Pset_fapl_mpio(file_access_plist, mpi_hdf5_comm, mpi_info);
+  H5Pset_fapl_mpio(file_access_plist, mpi_hdf5_comm, MPI_INFO_NULL);
 
   // Open the file collectively
-  // H5F_ACC_TRUNC - overwrite existing file. H5F_ACC_EXCL - no overwrite
-  // 3rd argument is file creation property list. Using default here
-  // 4th argument is the file access property list identifier
+  // H5F_ACC_RDWR - sets access to read or write on open of existing file.
+  // 3rd argument is the file access property list identifier
   hid_t file_identifier = H5Fopen(filename, H5F_ACC_RDWR, file_access_plist);
 
   // release the file access template
   H5Pclose(file_access_plist);
-  MPI_Info_free(&mpi_info);
 
   return file_identifier;
 }
