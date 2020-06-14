@@ -163,9 +163,9 @@ hid_t open_hdf5_file(const char *filename, MPI_Comm mpi_hdf5_comm){
   H5Pset_fapl_mpio(file_access_plist, mpi_hdf5_comm, MPI_INFO_NULL);
 
   // Open the file collectively
-  // H5F_ACC_RDWR - sets access to read or write on open of existing file.
+  // H5F_ACC_RDONLY - sets access to read or write on open of existing file.
   // 3rd argument is the file access property list identifier
-  hid_t file_identifier = H5Fopen(filename, H5F_ACC_RDWR, file_access_plist);
+  hid_t file_identifier = H5Fopen(filename, H5F_ACC_RDONLY, file_access_plist);
 
   // release the file access template
   H5Pclose(file_access_plist);
