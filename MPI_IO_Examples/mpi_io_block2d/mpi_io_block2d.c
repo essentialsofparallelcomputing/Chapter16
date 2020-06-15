@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
   if (ncolors > 1) {
     sprintf(filename,"example_%02d.data",color);
   } else {
-    sprintf(filename,"example.data",color);
+    sprintf(filename,"example.data");
   }
 
   // Do the computation and write out a sequence of files
