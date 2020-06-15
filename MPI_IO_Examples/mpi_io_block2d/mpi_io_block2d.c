@@ -89,12 +89,14 @@ int main(int argc, char *argv[])
   if (rank == 0) {
      FILE *fp = fopen("example.data","rb");
      for (int j = 0; j < 10; j++){
+       printf("x[%d][ ] ",j);
        for (int i = 0; i < 40; i++){
          double x;
          fread(&x, sizeof(double), 1, fp);
-         printf("x[%d][%d] %lf\n",j,i,x);
-       }
-     }
+         printf("%3.0lf ",x);
+       }   
+       printf("\n");
+     }   
   }
 
   free(data);
