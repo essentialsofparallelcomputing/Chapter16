@@ -159,11 +159,11 @@ hid_t open_hdf5_file(const char *filename, MPI_Comm mpi_hdf5_comm){
   // set collective mode for metadata reads (ops)
   H5Pset_all_coll_metadata_ops(file_access_plist, true);
 
-  // tell the HDF5 library that we want to use MPI-IO to do the writing
+  // tell the HDF5 library that we want to use MPI-IO to do the reading
   H5Pset_fapl_mpio(file_access_plist, mpi_hdf5_comm, MPI_INFO_NULL);
 
   // Open the file collectively
-  // H5F_ACC_RDONLY - sets access to read or write on open of existing file.
+  // H5F_ACC_RDONLY - sets access to read or write on open of an existing file.
   // 3rd argument is the file access property list identifier
   hid_t file_identifier = H5Fopen(filename, H5F_ACC_RDONLY, file_access_plist);
 
