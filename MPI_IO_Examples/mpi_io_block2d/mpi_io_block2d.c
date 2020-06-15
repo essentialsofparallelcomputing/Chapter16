@@ -88,10 +88,12 @@ int main(int argc, char *argv[])
 
   if (rank == 0) {
      FILE *fp = fopen("example.data","rb");
-     for (int i = 0; i < 40; i++){
-       double x;
-       fread(&x, sizeof(double), 1, fp);
-       printf("x[%d] %lf\n",i,x);
+     for (int j = 0; j < 10; j++){
+       for (int i = 0; i < 40; i++){
+         double x;
+         fread(&x, sizeof(double), 1, fp);
+         printf("x[%d][%d] %lf\n",j,i,x);
+       }
      }
   }
 
@@ -104,7 +106,7 @@ int main(int argc, char *argv[])
 }
 
 void init_array(int ny, int nx, int ng, double **array) {
-  // initialize the guardcells to 0, and the interior i+j+100*rank
+  // initialize the halo cells to 0, and the interior i+j+100*rank
   int rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 

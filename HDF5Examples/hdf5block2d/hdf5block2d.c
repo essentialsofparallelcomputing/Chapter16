@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
 }
 
 void init_array(int ny, int nx, int ng, double **array) {
-  // initialize the guardcells to 0, and the interior i+j+100*rank
+  // initialize the halo cells to 0, and the interior i+j+100*rank
   int rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
