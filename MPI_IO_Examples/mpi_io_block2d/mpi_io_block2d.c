@@ -101,6 +101,8 @@ int main(int argc, char *argv[])
   free(data_restore);
 
   MPI_Comm_free(&mpi_io_comm);
+  MPI_Comm_free(&mpi_row_comm);
+  MPI_Comm_free(&mpi_col_comm);
   MPI_Finalize();
   return 0;
 }
