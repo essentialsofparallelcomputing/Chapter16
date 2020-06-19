@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include "mpi_io_file_ops.h"
 
 MPI_File create_mpi_io_file(const char *filename, MPI_Comm mpi_io_comm,
@@ -53,7 +54,7 @@ MPI_File create_mpi_io_file(const char *filename, MPI_Comm mpi_io_comm,
 
   MPI_Info mpi_info = MPI_INFO_NULL; // For MPI IO hints
   MPI_Info_create(&mpi_info);
-  MPI_Info_set(mpi_info, "collective_buffering", "1");
+  MPI_Info_set(mpi_info, "collective_buffering", "true");
   MPI_Info_set(mpi_info, "striping_factor", "8");
   MPI_Info_set(mpi_info, "striping_unit", "4194304");
 
@@ -82,7 +83,7 @@ MPI_File open_mpi_io_file(const char *filename, MPI_Comm mpi_io_comm){
 
   MPI_Info mpi_info = MPI_INFO_NULL; // For MPI IO hints
   MPI_Info_create(&mpi_info);
-  MPI_Info_set(mpi_info, "collective_buffering", "1");
+  MPI_Info_set(mpi_info, "collective_buffering", "true");
 
   MPI_File file_handle = NULL;
   MPI_File_open(mpi_io_comm, filename, file_mode, mpi_info, &file_handle);

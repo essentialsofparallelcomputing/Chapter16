@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
   MPI_Comm_split(mpi_hdf5_comm, col_color, rank_color, &mpi_col_comm);
 
   // set the dimensions of our data array and the number of ghost cells
-  int ndim = 2, ng = 2, ny = 10, nx = 10;
+  int ndims = 2, ng = 2, ny = 10, nx = 10;
   int global_subsizes[] = {ny, nx};
 
   int ny_offset = 0, nx_offset = 0;
@@ -79,11 +79,50 @@ int main(int argc, char *argv[])
   int ierr_global = 0;
   MPI_Allreduce(&ierr, &ierr_global, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
   if (rank == 0 && ierr_global == 0) printf("   Checkpoint has been verified\n");
+  
+  if (rank == 0) {
+     hsize_t dims[] = {ny, nx};
+     filespace = H5Screate_simple(ndims, dims, NULL);
+     hsize_t  start[] = {0,         0};
+     hsize_t stride[] = {1,         1}; 
+     hsize_t  count[] = {ny_global, nx_global};
+
+     H5Sselect_hyperslab(filespace, H5S_SELECT_SET,
+                start, stride, count, NULL);
+
+     dims[0] = ny_global+2*ng;
+     dims[1] = nx_global+2*ng;
+     memspace = H5Screate_simple(ndims, dims, NULL);
+     hsize_t  mstart[] = {ng,   ng};
+     hsize_t mstride[] = {1,    1}; 
+     hsize_t  mcount[] = {ny_global,   nx_global};
+
+     H5Sselect_hyperslab(memspace, H5S_SELECT_SET,
+                      mstart, mstride, mcount, NULL);
+
+     hid_t file_identifier = H5Fopen(filename, H5F_ACC_RDONLY, H5P_DEFAULT);
+     hid_t dataset = H5Dopen2(file_identifier, "data array", H5P_DEFAULT);
+
+     double **data_check = (double **)malloc2D(ny_global+2*ng, nx_global+2*ng);
+     H5Dread(dataset, H5T_IEEE_F64LE, memspace, filespace, H5P_DEFAULT,
+          &(data_check[0][0]));
+     /*
+
+     for (int j = 0; j < ny_global; j++){
+       for (int i = 0; i < nx_global; i++){
+         printf("x[%d][%d] %lf\n",j,i,data_check[j+ng][i+ng]);
+       }
+     }   
+     */
+  }
 
   free(data);
   free(data_restore);
 
   MPI_Comm_free(&mpi_hdf5_comm);
+  MPI_Comm_free(&mpi_row_comm);
+  MPI_Comm_free(&mpi_col_comm);
+
   MPI_Finalize();
   return 0;
 }
