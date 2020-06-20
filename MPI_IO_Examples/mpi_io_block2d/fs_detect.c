@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <sys/statfs.h>
-// Filesystem types are listed in system include directory in linux/magic.h
+// File system types are listed in system include directory in linux/magic.h
 // You will need to add any additional parallel file system magic codes
 #define LUSTRE_MAGIC1    0x858458f6
 #define LUSTRE_MAGIC2    0xbd00bd0
@@ -12,5 +12,5 @@ int main(int argc, char *argv[])
 {
   struct statfs buf;
   statfs("CMakeLists.txt", &buf);
-  printf("Filesystem type is %lx\n",buf.f_type);
+  printf("File system type is %lx\n",buf.f_type);
 }
