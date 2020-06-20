@@ -25,6 +25,8 @@ set_target_properties(mpi_io_block2d PROPERTIES COMPILE_FLAGS "${MPI_C_COMPILE_F
 set_target_properties(mpi_io_block2d PROPERTIES LINK_FLAGS "${MPI_C_LINK_FLAGS}")
 target_link_libraries(mpi_io_block2d ${MPI_C_LIBRARIES})
 
+add_executable(fs_detect fs_detect.c)
+
 # Cleanup
 add_custom_target(distclean COMMAND rm -rf CMakeCache.txt CMakeFiles
                   Makefile cmake_install.cmake *.data)
