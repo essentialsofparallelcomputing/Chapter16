@@ -11,6 +11,6 @@
 int main(int argc, char *argv[])
 {
   struct statfs buf;
-  statfs("CMakeLists.txt", &buf);
+  statfs("./fs_detect", &buf);
   printf("Filesystem type is %lx\n",buf.f_type);
 }
