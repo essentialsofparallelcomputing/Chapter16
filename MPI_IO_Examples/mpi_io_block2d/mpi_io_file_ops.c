@@ -60,7 +60,7 @@ MPI_File create_mpi_io_file(const char *filename, MPI_Comm mpi_io_comm,
 
   MPI_File file_handle = NULL;
   MPI_File_open(mpi_io_comm, filename, file_mode, mpi_info, &file_handle);
-  if (file_size > 0) MPI_File_preallocate(file_handle, file_size);
+  if (file_size > 0) MPI_File_set_size(file_handle, file_size);
   file_offset = 0;
   return file_handle;
 }
