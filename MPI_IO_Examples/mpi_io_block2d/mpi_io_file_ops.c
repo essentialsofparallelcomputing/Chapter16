@@ -54,8 +54,17 @@ MPI_File create_mpi_io_file(const char *filename, MPI_Comm mpi_io_comm,
 
   MPI_Info mpi_info = MPI_INFO_NULL; // For MPI IO hints
   MPI_Info_create(&mpi_info);
+  MPI_Info_set(mpi_info, "xxx", "true");
   MPI_Info_set(mpi_info, "collective_buffering", "true");
+  MPI_Info_set(mpi_info, "cb_buffer_size", "4194304");
+  MPI_Info_set(mpi_info, "cb_nodes", "2");
+  MPI_Info_set(mpi_info, "cb_block_size", "4194304");
+  MPI_Info_set(mpi_info, "cb_num_aggregators", "4194304");
+  MPI_Info_set(mpi_info, "cb_sharedfp_lazy_open", "1");
   MPI_Info_set(mpi_info, "striping_factor", "8");
+  MPI_Info_set(mpi_info, "striping_unit", "4194304");
+  MPI_Info_set(mpi_info, "fs_lustre_stripe_width", "8");
+  MPI_Info_set(mpi_info, "fs_lustre_stripe_size", "4194304");
   MPI_Info_set(mpi_info, "striping_unit", "4194304");
 
   MPI_File file_handle = NULL;
