@@ -11,10 +11,11 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
 # Require MPI for this project:
 find_package(MPI REQUIRED)
 
+set(HDF5_PREFER_PARALLEL true)
 find_package(HDF5 1.10.6 REQUIRED)
-if (HDF5_IS_PARALLEL)
-    message("found parallel HDF5")
-endif (HDF5_IS_PARALLEL)
+if (NOT HDF5_IS_PARALLEL)
+    message(FATAL_ERROR " -- HDF5 version is not parallel.")
+endif (NOT HDF5_IS_PARALLEL)
 
 
 find_package(Vector)
