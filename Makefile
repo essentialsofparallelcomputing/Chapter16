@@ -3,10 +3,14 @@ All: MPI_IO HDF5 Hardware_Software_info File_Query
 .PHONY: MPI_IO HDF5 Hardware_Software_info File_Query
 
 MPI_IO: MPI_IO_Examples/mpi_io_block2d/build/mpi_io_block2d
+
+MPI_IO_Examples/mpi_io_block2d/build/mpi_io_block2d:
 	cd MPI_IO_Examples/mpi_io_block2d && mkdir build && cd build && cmake .. && make && \
 	mpirun -n 4 ./mpi_io_block2d
 
 HDF5: HDF5Examples/hdf5block2d/build/hdf5block2d
+
+HDF5Examples/hdf5block2d/build/hdf5block2d:
 	cd HDF5Examples/hdf5block2d && mkdir build && cd build && cmake .. && make && \
 	mpirun -n 4 ./hdf5block2d
 
