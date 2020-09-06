@@ -33,10 +33,12 @@ ENV LC_ALL=$DOCKER_LANG.UTF-8
 RUN apt-get -qq update && \
     DEBIAN_FRONTEND=noninteractive \
     apt-get -qq install -y cmake git vim gcc g++ gfortran software-properties-common \
-            mpich libmpich-dev \
             openmpi-bin openmpi-doc libopenmpi-dev \
-            libhdf5-mpich-dev libhdf5-openmpi-dev libhdf5-mpi-dev && \
+            libhdf5-openmpi-dev && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
+#   mpich libmpich-dev \
+#   libhdf5-mpich-dev libhdf5-mpi-dev && \
+
 
 # Installing latest GCC compiler (version 10)
 RUN apt-get -qq update && \

@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
   if (ncolors > 1) {
     sprintf(filename,"example_%02d.hdf5",color);
   } else {
-    sprintf(filename,"example.hdf5",color);
+    sprintf(filename,"example.hdf5");
   }
 
   // Do the computation and write out a sequence of files
