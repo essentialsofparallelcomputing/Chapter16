@@ -15,8 +15,9 @@ int main(int argc, char *argv[])
 
   // for multiple files, subdivide communicator and set colors for each set
   MPI_Comm mpi_io_comm = MPI_COMM_NULL;
+  int ncolors = 1, color = 0;
   MPI_Comm_dup(MPI_COMM_WORLD, &mpi_io_comm);
-  int ncolors = 1, color = 0, nprocs_color, rank_color;
+  int nprocs_color, rank_color;
   MPI_Comm_size(mpi_io_comm, &nprocs_color);
   MPI_Comm_rank(mpi_io_comm, &rank_color);
   int row_color = 1, col_color = rank_color;
