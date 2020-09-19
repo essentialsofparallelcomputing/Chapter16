@@ -4,7 +4,7 @@ hid_t create_hdf5_file(const char *filename, MPI_Comm mpi_hdf5_comm);
 hid_t open_hdf5_file(const char *filename, MPI_Comm mpi_hdf5_comm);
 hid_t create_hdf5_filespace(int ndims, int ny_global, int nx_global, int ny, int nx,
     int ny_offset, int nx_offset, MPI_Comm mpi_hdf5_comm);
-hid_t create_hdf5_memspace(int ny, int nx, int ng);
+hid_t create_hdf5_memspace(int ndims, int ny, int nx, int ng);
 hid_t create_hdf5_dataset(hid_t file_identifier, hid_t filespace);
 hid_t open_hdf5_dataset(hid_t file_identifier);
 

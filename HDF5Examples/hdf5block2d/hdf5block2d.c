@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
   int nfiles = 1;
   float ranks_per_file = (float)nprocs/(float)nfiles;
   int color = (int)((float)rank/ranks_per_file);
-  MPI_Comm_split(MPI_COMM_WORLD, color, rank, &mpi_io_comm);
+  MPI_Comm_split(MPI_COMM_WORLD, color, rank, &mpi_hdf5_comm);
   int nprocs_color, rank_color;
   MPI_Comm_size(mpi_hdf5_comm, &nprocs_color);
   MPI_Comm_rank(mpi_hdf5_comm, &rank_color);
@@ -50,11 +50,11 @@ int main(int argc, char *argv[])
   }
 
   hid_t memspace = H5S_NULL, filespace = H5S_NULL;
-  hdf5_file_init(ng, ny_global, nx_global, ny, nx, ny_offset, nx_offset,
+  hdf5_file_init(ng, ndims, ny_global, nx_global, ny, nx, ny_offset, nx_offset,
                  mpi_hdf5_comm, &memspace, &filespace);
 
   char filename[30];
-  if (ncolors > 1) {
+  if (nfiles > 1) {
     sprintf(filename,"example_%02d.hdf5",color);
   } else {
     sprintf(filename,"example.hdf5");
@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
   if (rank == 0 && ierr_global == 0) printf("   Checkpoint has been verified\n");
   
   if (rank == 0) {
-     hsize_t dims[] = {ny, nx};
+     hsize_t dims[] = {ny_global, nx_global};
      filespace = H5Screate_simple(ndims, dims, NULL);
      hsize_t  start[] = {0,         0};
      hsize_t stride[] = {1,         1}; 
@@ -110,12 +110,14 @@ int main(int argc, char *argv[])
      double **data_check = (double **)malloc2D(ny_global+2*ng, nx_global+2*ng);
      H5Dread(dataset, H5T_IEEE_F64LE, memspace, filespace, H5P_DEFAULT,
           &(data_check[0][0]));
-     /*
 
+     /*
      for (int j = 0; j < ny_global; j++){
+       printf("x[%d] ",j);
        for (int i = 0; i < nx_global; i++){
-         printf("x[%d][%d] %lf\n",j,i,data_check[j+ng][i+ng]);
+         printf("%.1lf ",data_check[j+ng][i+ng]);
        }
+       printf("\n");
      }   
      */
   }
