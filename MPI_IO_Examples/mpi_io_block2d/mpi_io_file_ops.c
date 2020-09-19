@@ -7,12 +7,9 @@ MPI_File open_mpi_io_file(const char *filename, MPI_Comm mpi_io_comm);
 
 static long long file_offset = 0;
 
-void mpi_io_file_init(int ng, int *global_sizes, int *global_subsizes,
+void mpi_io_file_init(int ng, int ndim, int *global_sizes, int *global_subsizes,
   int *global_starts, MPI_Datatype *memspace, MPI_Datatype *filespace){
   // create data descriptors on disk and in memory
-
-  // Global view of entire 2D domain -- collates decomposed subarrays
-  int ndim = sizeof(global_sizes)/sizeof(global_sizes[0]);
 
   MPI_Type_create_subarray(ndim, global_sizes, global_subsizes, global_starts,
                            MPI_ORDER_C, MPI_DOUBLE, filespace);

@@ -16,8 +16,10 @@ int main(int argc, char *argv[])
 
   // for multiple files, subdivide communicator and set colors for each set
   MPI_Comm mpi_io_comm = MPI_COMM_NULL;
-  int ncolors = 1, color = 0;
-  MPI_Comm_dup(MPI_COMM_WORLD, &mpi_io_comm);
+  int nfiles = 1;
+  float ranks_per_file = (float)nprocs/(float)nfiles;
+  int color = (int)((float)rank/ranks_per_file);
+  MPI_Comm_split(MPI_COMM_WORLD, color, rank, &mpi_io_comm);
   int nprocs_color, rank_color;
   MPI_Comm_size(mpi_io_comm, &nprocs_color);
   MPI_Comm_rank(mpi_io_comm, &rank_color);
@@ -51,11 +53,11 @@ int main(int argc, char *argv[])
   }
 
   MPI_Datatype memspace = MPI_DATATYPE_NULL, filespace = MPI_DATATYPE_NULL;
-  mpi_io_file_init(ng, global_sizes, global_subsizes, global_offsets,
+  mpi_io_file_init(ng, ndim, global_sizes, global_subsizes, global_offsets,
       &memspace, &filespace);
 
   char filename[30];
-  if (ncolors > 1) {
+  if (nfiles > 1) {
     sprintf(filename,"example_%02d.data",color);
   } else {
     sprintf(filename,"example.data");
