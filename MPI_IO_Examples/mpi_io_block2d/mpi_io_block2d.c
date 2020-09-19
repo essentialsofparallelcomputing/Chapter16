@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
   MPI_Comm_split(mpi_io_comm, col_color, rank_color, &mpi_col_comm);
 
   // set the dimensions of our data array and the number of ghost cells
-  int ndim = 2, ng = 2, ny = 10, nx = 10;
+  int ndims = 2, ng = 2, ny = 10, nx = 10;
   int global_subsizes[] = {ny, nx};
 
   int ny_offset = 0, nx_offset = 0;
@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
   }
 
   MPI_Datatype memspace = MPI_DATATYPE_NULL, filespace = MPI_DATATYPE_NULL;
-  mpi_io_file_init(ng, ndim, global_sizes, global_subsizes, global_offsets,
+  mpi_io_file_init(ng, ndims, global_sizes, global_subsizes, global_offsets,
       &memspace, &filespace);
 
   char filename[30];

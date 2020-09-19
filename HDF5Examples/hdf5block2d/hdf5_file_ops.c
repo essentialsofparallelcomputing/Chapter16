@@ -2,26 +2,25 @@
 
 hid_t create_hdf5_file(const char *filename, MPI_Comm mpi_hdf5_comm);
 hid_t open_hdf5_file(const char *filename, MPI_Comm mpi_hdf5_comm);
-hid_t create_hdf5_filespace(int ny_global, int nx_global, int ny, int nx,
+hid_t create_hdf5_filespace(int ndims, int ny_global, int nx_global, int ny, int nx,
     int ny_offset, int nx_offset, MPI_Comm mpi_hdf5_comm);
 hid_t create_hdf5_memspace(int ny, int nx, int ng);
 hid_t create_hdf5_dataset(hid_t file_identifier, hid_t filespace);
 hid_t open_hdf5_dataset(hid_t file_identifier);
 
-void hdf5_file_init(int ng, int ny_global, int nx_global, int ny, int nx,
+void hdf5_file_init(int ng, int ndims, int ny_global, int nx_global, int ny, int nx,
     int ny_offset, int nx_offset, MPI_Comm mpi_hdf5_comm,
     hid_t *memspace, hid_t *filespace){
   // create data descriptors on disk and in memory
-  *filespace = create_hdf5_filespace(ny_global, nx_global, ny, nx,
+  *filespace = create_hdf5_filespace(ndims, ny_global, nx_global, ny, nx,
                ny_offset, nx_offset, mpi_hdf5_comm);
-  *memspace  = create_hdf5_memspace(ny, nx, ng);
+  *memspace  = create_hdf5_memspace(ndims, ny, nx, ng);
 }
 
-hid_t create_hdf5_filespace(int ny_global, int nx_global, int ny, int nx,
+hid_t create_hdf5_filespace(int ndims, int ny_global, int nx_global, int ny, int nx,
     int ny_offset, int nx_offset, MPI_Comm mpi_hdf5_comm){
   // create the dataspace for data stored on disk using the hyperslab call
   hsize_t dims[] = {ny_global, nx_global};
-  int ndims = sizeof(dims)/sizeof(hsize_t);
 
   hid_t filespace = H5Screate_simple(ndims, dims, NULL);
 
@@ -35,10 +34,9 @@ hid_t create_hdf5_filespace(int ny_global, int nx_global, int ny, int nx,
   return filespace;
 }
 
-hid_t create_hdf5_memspace(int ny, int nx, int ng) {
+hid_t create_hdf5_memspace(int ndims, int ny, int nx, int ng) {
   // create a memory space in memory using the hyperslab call
   hsize_t dims[] = {ny+2*ng, nx+2*ng};
-  int ndims = sizeof(dims)/sizeof(hsize_t);
 
   hid_t memspace = H5Screate_simple(ndims, dims, NULL);
 

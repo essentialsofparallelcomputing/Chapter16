@@ -10,13 +10,17 @@ int main(int argc, char *argv[])
 {
   MPI_Init(&argc, &argv);
 
-  int rank;
+  int rank, nprocs;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
 
   // for multiple files, subdivide communicator and set colors for each set
   MPI_Comm mpi_hdf5_comm = MPI_COMM_NULL;
-  MPI_Comm_dup(MPI_COMM_WORLD, &mpi_hdf5_comm);
-  int ncolors = 1, color = 0, nprocs_color, rank_color;
+  int nfiles = 1;
+  float ranks_per_file = (float)nprocs/(float)nfiles;
+  int color = (int)((float)rank/ranks_per_file);
+  MPI_Comm_split(MPI_COMM_WORLD, color, rank, &mpi_io_comm);
+  int nprocs_color, rank_color;
   MPI_Comm_size(mpi_hdf5_comm, &nprocs_color);
   MPI_Comm_rank(mpi_hdf5_comm, &rank_color);
   int row_color = 1, col_color = rank_color;
