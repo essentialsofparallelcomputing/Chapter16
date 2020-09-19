@@ -11,6 +11,7 @@ void mpi_io_file_init(int ng, int ndims, int *global_sizes, int *global_subsizes
   int *global_starts, MPI_Datatype *memspace, MPI_Datatype *filespace){
   // create data descriptors on disk and in memory
 
+  // Global view of entire 2D domain -- collates decomposed subarrays
   MPI_Type_create_subarray(ndims, global_sizes, global_subsizes, global_starts,
                            MPI_ORDER_C, MPI_DOUBLE, filespace);
   MPI_Type_commit(filespace);
@@ -51,17 +52,8 @@ MPI_File create_mpi_io_file(const char *filename, MPI_Comm mpi_io_comm,
 
   MPI_Info mpi_info = MPI_INFO_NULL; // For MPI IO hints
   MPI_Info_create(&mpi_info);
-  MPI_Info_set(mpi_info, "xxx", "true");
   MPI_Info_set(mpi_info, "collective_buffering", "true");
-  MPI_Info_set(mpi_info, "cb_buffer_size", "4194304");
-  MPI_Info_set(mpi_info, "cb_nodes", "2");
-  MPI_Info_set(mpi_info, "cb_block_size", "4194304");
-  MPI_Info_set(mpi_info, "cb_num_aggregators", "4194304");
-  MPI_Info_set(mpi_info, "cb_sharedfp_lazy_open", "1");
   MPI_Info_set(mpi_info, "striping_factor", "8");
-  MPI_Info_set(mpi_info, "striping_unit", "4194304");
-  MPI_Info_set(mpi_info, "fs_lustre_stripe_width", "8");
-  MPI_Info_set(mpi_info, "fs_lustre_stripe_size", "4194304");
   MPI_Info_set(mpi_info, "striping_unit", "4194304");
 
   MPI_File file_handle = NULL;
