@@ -16,7 +16,7 @@ HDF5Examples/hdf5block2d/build/hdf5block2d:
 
 Hardware_Software_info:
 	ompi_info |grep "MCA io:"
-	ompi_info --param io ompio --level 9 |grep ":parameter"
+	ompi_info --param io ompio --level 9 |grep ": parameter"
 	cd MPI_IO_Examples/mpi_io_block2d && mkdir build_info && cd build_info && cmake .. && make && \
 	mpirun --mca -io_ompio_verbose_info_parsing 1 -n 4 ./mpi_io_block2d && \
 	export ROMIO_PRINT_HINTS=1; mpirun -n 4 ./mpi_io_block2d
