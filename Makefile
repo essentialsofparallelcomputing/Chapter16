@@ -27,7 +27,8 @@ Hardware_Software_info:
 File_Query:
 	cd MPI_IO_Examples/mpi_io_block2d && \
 	mkdir build_query && cd build_query && cmake .. && make && \
-	grep `./fs_detect |cut -f 4 -d' '` /usr/include/linux/magic.h ../fs_detect.c
+	./fs_detect && \
+	grep `./fs_detect |cut -f 5 -d' '` /usr/include/linux/magic.h ../fs_detect.c
 
 clean:
 	cd MPI_IO_Examples/mpi_io_block2d && rm -rf build build_info build_query
