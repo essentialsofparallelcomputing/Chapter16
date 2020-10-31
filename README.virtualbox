@@ -1,4 +1,4 @@
-# These are instructions to setup a Ubuntu virtual machine for the examples in
+# These are instructions to setup an Ubuntu virtual machine for the examples in
 # this chapter. The first part of the instructions must be done manually. The
 # last half can be done by executing this file as a script as instructed.
 
@@ -31,28 +31,29 @@
 # git clone --recursive https://github.com/essentialsofparallelcomputing/Chapter16.git
 # Run the script Chapter16/README.virtualbox
 
-DEBIAN_FRONTEND=noninteractive
 sudo apt-get -qq update && \
-sudo apt-get -qq install -y cmake git vim gcc g++ gfortran software-properties-common \
-                        mpich libmpich-dev \
-                        openmpi-bin openmpi-doc libopenmpi-dev \
-                        libhdf5-mpich-dev libhdf5-openmpi-dev libhdf5-mpi-dev && \
-sudo apt-get clean && \
-sudo rm -rf /var/lib/apt/lists/*
+    DEBIAN_FRONTEND=noninteractive \
+    sudo apt-get -qq install -y cmake git vim gcc g++ gfortran software-properties-common \
+            openmpi-bin openmpi-doc libopenmpi-dev \
+            libhdf5-openmpi-dev
 
 # Installing latest GCC compiler (version 10)
-sudo apt-get -qq update && \
-sudo apt-get -qq install -y gcc-10 g++-10 gfortran-10 && \
-sudo apt-get clean && \
-sudo rm -rf /var/lib/apt/lists/*
+sudo apt-get -qq install -y gcc-10 g++-10 gfortran-10
 
-sudo update-alternatives --install /usr/bin/gcc       gcc       /usr/bin/gcc-10 90 \
-                         --slave   /usr/bin/g++       g++       /usr/bin/g++-10 \
-                         --slave   /usr/bin/gfortran  gfortran  /usr/bin/gfortran-10 \
-                         --slave   /usr/bin/gcov      gcov      /usr/bin/gcov-10
+sudo update-alternatives \
+      --install /usr/bin/gcc      gcc      /usr/bin/gcc-9       80 \
+      --slave   /usr/bin/g++      g++      /usr/bin/g++-9          \
+      --slave   /usr/bin/gfortran gfortran /usr/bin/gfortran-9     \
+      --slave   /usr/bin/gcov     gcov     /usr/bin/gcov-9
+sudo update-alternatives \
+      --install /usr/bin/gcc      gcc      /usr/bin/gcc-10      90 \
+      --slave   /usr/bin/g++      g++      /usr/bin/g++-10         \
+      --slave   /usr/bin/gfortran gfortran /usr/bin/gfortran-10    \
+      --slave   /usr/bin/gcov     gcov     /usr/bin/gcov-10
+sudo chmod u+s /usr/bin/update-alternatives
+
+sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*
 
 # If Software updater prompts, install updated software --> wait ....
-
-source ~/.bash_profile
 
 cd Chapter16; #make
